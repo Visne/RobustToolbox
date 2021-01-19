@@ -65,6 +65,8 @@ namespace Robust.Server.GameObjects
 
             Register<TimerComponent>();
 
+            //Register<ServerEyeComponent>();
+
             RegisterIgnore("AnimationPlayer");
 
 #if DEBUG

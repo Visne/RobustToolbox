@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Prometheus;
 using Robust.Server.GameObjects.Components;
 using Robust.Server.GameObjects.EntitySystemMessages;
@@ -10,6 +11,7 @@ using Robust.Server.Interfaces.Timing;
 using Robust.Server.Player;
 using Robust.Shared;
 using Robust.Shared.Containers;
+using Robust.Shared.EntityLookup;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Systems;
 using Robust.Shared.Interfaces.Configuration;
@@ -206,7 +208,14 @@ namespace Robust.Server.GameObjects
             var mapId = transform.MapID;
 
             // TODO: This is based on the old method but ideally it iterates through all of their eyes enlarged
-            var viewbox = new Box2(playerPos, playerPos).Enlarged(range);
+            List<Box2> viewboxes = new();
+            viewboxes.Add(new Box2(playerPos, playerPos).Enlarged(range));
+
+            foreach (var serverEye in player.ServerEyeComponents)
+            {
+                Box2 viewbox = new Box2(serverEye.Position, serverEye.Position).Enlarged(range);
+                viewboxes.Add(viewbox);
+            }
 
             var seenEntities = new HashSet<EntityUid>();
 
@@ -227,10 +236,17 @@ namespace Robust.Server.GameObjects
                 }
             }
 
+            // Store all chunks in all viewboxes in list chunks
+            List<EntityLookupChunk> chunks = new();
+            foreach (var viewbox in viewboxes)
+            {
+                chunks.AddRange(_lookupSystem.GetChunksInRange(mapId, viewbox));
+            }
+
             // TODO: For stuff that needs a higher pvs range (e.g. lights) can either
             // A) Store the comps in the chunks directly and use an enlarged viewbox or
             // B) Make a separate DynamicTree for them (probably preferable?)
-            foreach (var chunk in _lookupSystem.GetChunksInRange(mapId, viewbox))
+            foreach (var chunk in chunks)
             {
                 var chunkLastSeen = data.LastSeen(chunk);
 

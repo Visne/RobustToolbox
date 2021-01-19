@@ -3,9 +3,12 @@ using Robust.Shared.GameStates;
 using Robust.Shared.Interfaces.GameObjects;
 using Robust.Server.GameObjects;
 using System;
+using System.Collections.Generic;
+using Robust.Server.GameObjects.Components.Eye;
 using Robust.Shared.Enums;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.Network;
+using Robust.Shared.Maths;
 using Robust.Shared.Network;
 using Robust.Shared.ViewVariables;
 
@@ -67,6 +70,12 @@ namespace Robust.Server.Player
 
         /// <inheritdoc />
         public DateTime ConnectedTime { get; private set; }
+        public List<ServerEyeComponent> ServerEyeComponents { get; } = new();
+
+        public void AddServerEyeComponent(Vector2 position)
+        {
+            ServerEyeComponents.Add(new ServerEyeComponent(position));
+        }
 
         /// <inheritdoc />
         [ViewVariables(VVAccess.ReadWrite)]

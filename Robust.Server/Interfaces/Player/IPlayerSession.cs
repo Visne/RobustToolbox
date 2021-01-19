@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using Robust.Server.GameObjects.Components.Eye;
 using Robust.Server.Player;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Interfaces.Network;
+using Robust.Shared.Maths;
 using Robust.Shared.Network;
 using Robust.Shared.Players;
 
@@ -13,6 +16,13 @@ namespace Robust.Server.Interfaces.Player
         EntityUid? AttachedEntityUid { get; }
         INetChannel ConnectedClient { get; }
         DateTime ConnectedTime { get; }
+
+        /// <summary>
+        ///     List of ServerEyes this player session has.
+        /// </summary>
+        List<ServerEyeComponent> ServerEyeComponents { get; }
+
+        public void AddServerEyeComponent(Vector2 position);
 
         /// <summary>
         ///     The visibility mask for this player.
